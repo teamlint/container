@@ -1,10 +1,10 @@
-package inject
+package container
 
-import "github.com/defval/inject/v2/di"
+import "github.com/teamlint/container/di"
 
 // OPTIONS
 
-// Option configures container. See inject.Provide(), inject.Bundle(), inject.Replace().
+// Option configures container. See container.Provide(), container.Bundle(), container.Replace().
 type Option interface {
 	apply(*Container)
 }
@@ -55,14 +55,14 @@ func Provide(provider interface{}, options ...ProvideOption) Option {
 
 // Bundle group together container options.
 //
-//   accountBundle := inject.Bundle(
-//     inject.Provide(NewAccountController),
-//     inject.Provide(NewAccountRepository),
+//   accountBundle := container.Bundle(
+//     container.Provide(NewAccountController),
+//     container.Provide(NewAccountRepository),
 //   )
 //
-//   authBundle := inject.Bundle(
-//     inject.Provide(NewAuthController),
-//     inject.Provide(NewAuthRepository),
+//   authBundle := container.Bundle(
+//     container.Provide(NewAuthController),
+//     container.Provide(NewAuthRepository),
 //   )
 //
 //   container, _ := New(
@@ -77,17 +77,17 @@ func Bundle(options ...Option) Option {
 	})
 }
 
-// ProvideOption modifies default provide behavior. See inject.WithName(), inject.As(), inject.Prototype().
+// ProvideOption modifies default provide behavior. See container.WithName(), container.As(), container.Prototype().
 type ProvideOption interface {
 	apply(params *di.ProvideParams)
 }
 
 // WithName sets string identifier for provided value.
 //
-//   inject.Provide(&http.Server{}, inject.WithName("first"))
-//   inject.Provide(&http.Server{}, inject.WithName("second"))
+//   container.Provide(&http.Server{}, container.WithName("first"))
+//   container.Provide(&http.Server{}, container.WithName("second"))
 //
-//   container.Extract(&server, inject.Name("second"))
+//   container.Extract(&server, container.Name("second"))
 func WithName(name string) ProvideOption {
 	return provideOption(func(provider *di.ProvideParams) {
 		provider.Name = name
@@ -97,7 +97,7 @@ func WithName(name string) ProvideOption {
 // As specifies interfaces that implement provider instance. Provide with As() automatically checks that constructor
 // result implements interface and creates slice group with it.
 //
-//   Provide(&http.ServerMux{}, inject.As(new(http.Handler)))
+//   Provide(&http.ServerMux{}, container.As(new(http.Handler)))
 //
 //   var handler http.Handler
 //   container.Extract(&handler) // extract as interface
@@ -114,7 +114,7 @@ func As(ifaces ...interface{}) ProvideOption {
 // Prototype modifies Provide() behavior. By default, each type resolves as a singleton. This option sets that
 // each type resolving creates a new instance of the type.
 //
-//   Provide(&http.Server{], inject.Prototype())
+//   Provide(&http.Server{], container.Prototype())
 //
 //   var server1 *http.Server
 //   var server2 *http.Server
@@ -128,11 +128,11 @@ func Prototype() ProvideOption {
 // ParameterBag is a provider parameter bag. It stores a construction parameters. It is a alternative way to
 // configure type.
 //
-//   inject.Provide(NewServer, inject.ParameterBag{
+//   container.Provide(NewServer, container.ParameterBag{
 //     "addr": ":8080",
 //   })
 //
-//   NewServer(pb inject.ParameterBag) *http.Server {
+//   NewServer(pb container.ParameterBag) *http.Server {
 //     return &http.Server{
 //       Addr: pb.RequireString("addr"),
 //     }
@@ -145,7 +145,7 @@ func (p ParameterBag) apply(provider *di.ProvideParams) {
 	}
 }
 
-// ExtractOption modifies default extract behavior. See inject.Name().
+// ExtractOption modifies default extract behavior. See container.Name().
 type ExtractOption interface {
 	apply(params *di.ExtractParams)
 }

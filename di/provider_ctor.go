@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/defval/inject/v2/di/internal/reflection"
+	"github.com/teamlint/container/di/internal/reflection"
 )
 
 type ctorType int

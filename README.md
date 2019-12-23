@@ -34,7 +34,7 @@ extensible.
 ## Installing
 
 ```shell
-go get -u github.com/defval/inject/v2
+go get -u github.com/teamlint/container
 ```
 
 This library follows [SemVer](http://semver.org/) strictly.
@@ -75,16 +75,16 @@ func NewServeMux() *http.ServeMux {
 Now let's teach a container to build these types.
 
 ```go
-container := inject.New(
+container.Build(
 	// provide http server
-	inject.Provide(NewServer),
+	container.Provide(NewServer),
     // provide http serve mux
-	inject.Provide(NewServeMux)
+	container.Provide(NewServeMux)
 )
 ```
 
-The function `inject.New()` parse our constructors, compile dependency
-graph and return `*inject.Container` type for interaction. Container
+The function `container.New()` parse our constructors, compile dependency
+graph and return `*container.Container` type for interaction. Container
 panics if it could not compile.
 
 > I think that panic at the initialization of the application and not in
@@ -151,7 +151,7 @@ func NewServer(handler http.Handler) *http.Server {
 ```
 
 For a container to know that as an implementation of `http.Handler` is
-necessary to use, we use the option `inject.As()`. The arguments of this
+necessary to use, we use the option `container.As()`. The arguments of this
 option must be a pointer(s) to an interface like `new(Endpoint)`.
 
 > This syntax may seem strange, but I have not found a better way to
@@ -160,11 +160,11 @@ option must be a pointer(s) to an interface like `new(Endpoint)`.
 Updated container initialization code:
 
 ```go
-container := inject.New(
+container := container.New(
 	// provide http server
-	inject.Provide(NewServer),
+	container.Provide(NewServer),
 	// provide http serve mux as http.Handler interface
-	inject.Provide(NewServeMux, inject.As(new(http.Handler)))
+	container.Provide(NewServeMux, container.As(new(http.Handler)))
 )
 ```
 
@@ -175,7 +175,7 @@ constructor. Using interfaces contributes to writing more testable code.
 
 Container automatically groups all implementations of interface to
 `[]<interface>` group. For example, provide with
-`inject.As(new(http.Handler)` automatically creates a group
+`container.As(new(http.Handler)` automatically creates a group
 `[]http.Handler`.
 
 Let's add some http controllers using this feature. Controllers have
@@ -235,16 +235,16 @@ func (e *UserController) RetrieveUsers(writer http.ResponseWriter, request *http
 }
 ```
 
-Just like in the example with interfaces, we will use `inject.As()`
+Just like in the example with interfaces, we will use `container.As()`
 provide option.
 
 ```go
-container := inject.New(
-	inject.Provide(NewServer),        // provide http server
-	inject.Provide(NewServeMux),       // provide http serve mux
+container := container.New(
+	container.Provide(NewServer),        // provide http server
+	container.Provide(NewServeMux),       // provide http serve mux
 	// endpoints
-	inject.Provide(NewOrderController, inject.As(new(Controller))),  // provide order controller
-	inject.Provide(NewUserController, inject.As(new(Controller))),  // provide user controller
+	container.Provide(NewOrderController, container.As(new(Controller))),  // provide order controller
+	container.Provide(NewUserController, container.As(new(Controller))),  // provide user controller
 )
 ```
 
@@ -284,22 +284,22 @@ type SlaveDatabase struct {
 }
 ```
 
-Second way is a using named definitions with `inject.WithName()` provide
+Second way is a using named definitions with `container.WithName()` provide
 option:
 
 ```go
 // provide master database
-inject.Provide(NewMasterDatabase, inject.WithName("master"))
+container.Provide(NewMasterDatabase, container.WithName("master"))
 // provide slave database
-inject.Provide(NewSlaveDatabase, inject.WithName("slave"))
+container.Provide(NewSlaveDatabase, container.WithName("slave"))
 ```
 
-If you need to extract it from container use `inject.Name()` extract
+If you need to extract it from container use `container.Name()` extract
 option.
 
 ```go
 var db *Database
-container.Extract(&db, inject.Name("master"))
+container.Extract(&db, container.Name("master"))
 ```
 
 If you need to provide named definition in other constructor use
@@ -356,17 +356,17 @@ type ServiceParameter struct {
 ### Parameter Bag
 
 If you need to specify some parameters on definition level you can use
-`inject.ParameterBag` provide option. This is a `map[string]interface{}`
+`container.ParameterBag` provide option. This is a `map[string]interface{}`
 that transforms to `di.ParameterBag` type.
 
 ```go
 // Provide server with parameter bag
-inject.Provide(NewServer, inject.ParameterBag{
+container.Provide(NewServer, container.ParameterBag{
 	"addr": ":8080",
 })
 
 // NewServer create a server with provided parameter bag. Note: use di.ParameterBag type.
-// Not inject.ParameterBag.
+// Not container.ParameterBag.
 func NewServer(pb di.ParameterBag) *http.Server {
 	return &http.Server{
 		Addr: pb.RequireString("addr"),
@@ -377,10 +377,10 @@ func NewServer(pb di.ParameterBag) *http.Server {
 ### Prototypes
 
 If you want to create a new instance on each extraction use
-`inject.Prototype()` provide option.
+`container.Prototype()` provide option.
 
 ```go
-inject.Provide(NewRequestContext, inject.Prototype())
+container.Provide(NewRequestContext, container.Prototype())
 ```
 
 > todo: real use case
@@ -409,9 +409,9 @@ After `container.Cleanup()` call, it iterate over instances and call
 cleanup function if it exists.
 
 ```go
-container := inject.New(
+container := container.New(
 	// ...
-    inject.Provide(NewFile),
+    container.Provide(NewFile),
 )
 
 // do something

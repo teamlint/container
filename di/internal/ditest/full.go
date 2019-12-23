@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/defval/inject/v2/di"
+	"github.com/teamlint/container/di"
 )
 
 // NewLogger

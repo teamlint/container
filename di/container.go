@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/defval/inject/v2/di/internal/dag"
-	"github.com/defval/inject/v2/di/internal/reflection"
+	"github.com/teamlint/container/di/internal/dag"
+	"github.com/teamlint/container/di/internal/reflection"
 )
 
 // New create new container.

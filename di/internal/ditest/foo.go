@@ -1,6 +1,6 @@
 package ditest
 
-import "github.com/defval/inject/v2/di"
+import "github.com/teamlint/container/di"
 
 // Foo test struct
 type Foo struct {

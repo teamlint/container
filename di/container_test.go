@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/defval/inject/v2/di"
-	"github.com/defval/inject/v2/di/internal/ditest"
+	"github.com/teamlint/container/di"
+	"github.com/teamlint/container/di/internal/ditest"
 )
 
 func TestContainerCompileErrors(t *testing.T) {

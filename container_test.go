@@ -1,4 +1,4 @@
-package inject_test
+package container_test
 
 import (
 	"fmt"
@@ -7,25 +7,24 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	"github.com/defval/inject/v2"
+	"github.com/teamlint/container"
 )
 
 func TestContainer(t *testing.T) {
-	var HTTPBundle = inject.Bundle(
-		inject.Provide(ProvideAddr("0.0.0.0", "8080")),
-		inject.Provide(NewMux, inject.As(new(http.Handler))),
-		inject.Provide(NewHTTPServer, inject.Prototype(), inject.WithName("server")),
+	var HTTPBundle = container.Bundle(
+		container.Provide(ProvideAddr("0.0.0.0", "8080")),
+		container.Provide(NewMux, container.As(new(http.Handler))),
+		container.Provide(NewHTTPServer, container.Prototype(), container.WithName("server")),
 	)
 
-	c := inject.New(HTTPBundle)
+	c := container.New(HTTPBundle)
 
 	var server1 *http.Server
-	err := c.Extract(&server1, inject.Name("server"))
+	err := c.Extract(&server1, container.Name("server"))
 	require.NoError(t, err)
 
 	var server2 *http.Server
-	err = c.Extract(&server2, inject.Name("server"))
+	err = c.Extract(&server2, container.Name("server"))
 	require.NoError(t, err)
 
 	err = c.Invoke(PrintAddr)

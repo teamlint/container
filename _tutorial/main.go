@@ -1,19 +1,21 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
-	"github.com/defval/inject/v2"
+	"github.com/teamlint/container"
 )
 
 func main() {
-	container := inject.New(
-		inject.Provide(NewServer),   // provide http server
-		inject.Provide(NewServeMux), // provide http serve mux
+	container.Build(
+		container.Provide(NewServer),   // provide http server
+		container.Provide(NewServeMux), // provide http serve mux
 		// endpoints
-		inject.Provide(NewOrderController, inject.As(new(Controller))), // provide order controller
-		inject.Provide(NewUserController, inject.As(new(Controller))),  // provide user controller
+		container.Provide(NewOrderController, container.As(new(Controller))), // provide order controller
+		container.Provide(NewUserController, container.As(new(Controller))),  // provide user controller
 	)
+	log.Println(container.Instance())
 
 	var server *http.Server
 	err := container.Extract(&server)
@@ -28,6 +30,7 @@ func main() {
 func NewServer(mux *http.ServeMux) *http.Server {
 	return &http.Server{
 		Handler: mux,
+		Addr:    ":8080",
 	}
 }
 

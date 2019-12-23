@@ -1,7 +1,7 @@
-package inject
+package container
 
 import (
-	"github.com/defval/inject/v2/di"
+	"github.com/teamlint/container/di"
 )
 
 // New creates a new container with provided options.
