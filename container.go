@@ -42,6 +42,11 @@ func (c *Container) Extract(target interface{}, options ...ExtractOption) (err e
 	}
 	return c.container.Extract(params)
 }
+func (c *Container) MustExtract(target interface{}, options ...ExtractOption) {
+	if err := c.Extract(target, options...); err != nil {
+		panic(err)
+	}
+}
 
 // Invoke invokes custom function. Dependencies of function will be resolved via container.
 func (c *Container) Invoke(fn interface{}) error {
@@ -49,6 +54,11 @@ func (c *Container) Invoke(fn interface{}) error {
 		Fn: fn,
 	}
 	return c.container.Invoke(params)
+}
+func (c *Container) MustInvoke(fn interface{}) {
+	if err := c.Invoke(fn); err != nil {
+		panic(err)
+	}
 }
 
 // Cleanup cleanup container.

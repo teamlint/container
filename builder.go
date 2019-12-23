@@ -34,11 +34,19 @@ func Extract(target interface{}, options ...ExtractOption) (err error) {
 	check()
 	return c.Extract(target, options...)
 }
+func MustExtract(target interface{}, options ...ExtractOption) {
+	check()
+	c.MustExtract(target, options...)
+}
 
 // Invoke invokes custom function. Dependencies of function will be resolved via container.
 func Invoke(fn interface{}) error {
 	check()
 	return c.Invoke(fn)
+}
+func MustInvoke(fn interface{}) {
+	check()
+	c.MustInvoke(fn)
 }
 
 // Cleanup cleanup container.
